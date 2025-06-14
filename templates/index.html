@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDF PLACE</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <!-- Welcome Popup -->
+  <div id="welcomePopup" class="popup-overlay">
+    <div class="popup-content professional">
+      <div class="popup-header">
+        <div class="welcome-logo">
+          <div class="logo-symbol">📚</div>
+          <h2>Welcome to PDF PLACE</h2>
+        </div>
+        <span class="close-popup" onclick="closeWelcomePopup()">&times;</span>
+      </div>
+      <div class="popup-body">
+        <div class="welcome-message">
+          <p class="welcome-subtitle">Your Ultimate Educational Resource Hub</p>
+          <p class="welcome-description">Access comprehensive study materials including NCERT books, PYQs, notes, mock tests, and much more - all in one centralized platform.</p>
+        </div>
+        
+        <div class="features-showcase">
+          <div class="feature-item">
+            <span class="feature-icon">📝</span>
+            <span class="feature-text">Mock Tests</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📚</span>
+            <span class="feature-text">NCERT Books</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📄</span>
+            <span class="feature-text">PYQs</span>
+          </div>
+          <div class="feature-item">
+            <span class="feature-icon">📖</span>
+            <span class="feature-text">Study Notes</span>
+          </div>
+        </div>
+        
+        <button onclick="closeWelcomePopup()" class="welcome-cta-btn">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Section -->
+  <div id="loginSection" class="login-section">
+    <div class="login-container">
+      <div class="login-header">
+        <h3>Sign in to PDF PLACE</h3>
+        <p class="login-subtitle">Access your educational resources</p>
+      </div>
+      
+      <div class="login-form">
+        <form id="loginForm" onsubmit="login(event)">
+          <div class="input-group">
+            <input type="email" id="username" name="email" placeholder="Email Address" required />
+            <span class="input-icon">👤</span>
+          </div>
+          
+          <div class="input-group">
+            <input type="password" id="password" name="password" placeholder="Password" required />
+            <span class="input-icon">🔒</span>
+            <button type="button" class="password-toggle" onclick="togglePasswordVisibility()">
+              <span id="passwordToggleIcon">👁️</span>
+            </button>
+          </div>
+          
+          <div class="login-options">
+            <label class="remember-me">
+              <input type="checkbox" id="rememberMe">
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-password" onclick="showForgotPassword()">Forgot Password?</a>
+          </div>
+          
+          <button type="submit" class="login-btn">Sign In</button>
+        </form>
+        
+        <div class="demo-credentials">
+          <p class="demo-title">Demo Access:</p>
+          <p class="demo-user">Use any email and password to create a new account</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Toast -->
+  <div id="errorToast" class="toast-notification error" style="display: none;">
+    <span id="errorMessage"></span>
+    <button onclick="hideToast('errorToast')">&times;</button>
+  </div>
+
+  <!-- Success Toast -->
+  <div id="successToast" class="toast-notification success" style="display: none;">
+    <span id="successMessage"></span>
+    <button onclick="hideToast('successToast')">&times;</button>
+  </div>
+
+  <!-- Forgot Password Modal -->
+  <div id="forgotPasswordModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content small">
+      <div class="modal-header">
+        <h3>Reset Password</h3>
+        <span class="close-modal" onclick="closeForgotPassword()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <p>Enter your email address to receive password reset instructions.</p>
+        <div class="input-group">
+          <input type="email" id="resetEmail" placeholder="Email Address" required />
+          <span class="input-icon">📧</span>
+        </div>
+        <div class="modal-actions">
+          <button onclick="sendPasswordReset()" class="primary-btn">Send Reset Link</button>
+          <button onclick="closeForgotPassword()" class="secondary-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application -->
+  <div id="mainApp" class="container">
+    <div class="app-header">
+      <div class="logo-container">
+        <div class="logo" id="logo">
+          <div class="logo-icon">
+            <div class="pdf-stack">
+              <div class="pdf-page pdf-page-1"></div>
+              <div class="pdf-page pdf-page-2"></div>
+              <div class="pdf-page pdf-page-3"></div>
+            </div>
+            <div class="upload-arrow">
+              <div class="arrow-line"></div>
+              <div class="arrow-head"></div>
+            </div>
+          </div>
+          <div class="logo-text">
+            <h1>PDF PLACE</h1>
+            <div class="logo-tagline">Your Educational Hub</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="header-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span id="themeIcon">🌙</span>
+        </button>
+        <button id="loginButton" onclick="showLoginSection()" class="login-btn-header" style="display: none;">
+          Login
+        </button>
+        <div class="user-info" id="userInfo">
+          <span id="currentUser">Welcome, User!</span>
+          <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="showTab('uploads')">📤 Uploads</button>
+      <button class="tab-btn" onclick="showTab('downloads')">📥 Downloads</button>
+      <button class="tab-btn" onclick="showTab('comments')" id="commentsTab">💬 Feedback</button>
+    </div>
+
+    <!-- Uploads Tab -->
+    <div id="uploadsTab" class="tab-content active">
+      <!-- Search and Filter Section -->
+      <div class="search-section">
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="Search PDFs..." onkeyup="searchPDFs()" />
+          <select id="categoryFilter" onchange="filterByCategory()">
+            <option value="">All Categories</option>
+            <option value="mocktest">Mock Tests</option>
+            <option value="ncert">NCERT Books</option>
+            <option value="pyqs">PYQs</option>
+            <option value="pw-notes">PW Notes</option>
+            <option value="kgs-notes">KGS Notes</option>
+            <option value="others">Others</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="upload-section" id="uploadSection" style="display: none;">
+        <h2>📤 Upload PDF (Admin Only)</h2>
+        <form id="uploadForm" enctype="multipart/form-data" onsubmit="uploadPDF(event)">
+          <select id="categorySelect" name="category">
+            <option value="others">Others</option>
+            <option value="mocktest">Mock Tests</option>
+            <option value="ncert">NCERT Books</option>
+            <option value="pyqs">PYQs</option>
+            <option value="pw-notes">PW Notes</option>
+            <option value="kgs-notes">KGS Notes</option>
+          </select>
+          <input type="file" id="pdfFile" name="file" accept=".pdf" required />
+          <button type="submit">Upload PDF</button>
+        </form>
+        <div id="uploadStatus"></div>
+      </div>
+      
+      <div class="files-section">
+        <h2>📚 Your PDFs</h2>
+        <div class="files-header">
+          <button onclick="loadPDFs()">🔄 Refresh List</button>
+          <div class="storage-info">
+            <span id="storageUsage">Storage: Loading...</span>
+          </div>
+        </div>
+        <div id="pdfList"></div>
+      </div>
+    </div>
+
+    <!-- Downloads Tab -->
+    <div id="downloadsTab" class="tab-content">
+      <div class="downloads-section">
+        <h2>📥 Download History</h2>
+        <div class="downloads-filter">
+          <select id="downloadsFilter" onchange="filterDownloads()">
+            <option value="">All Downloads</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+          <button onclick="clearDownloadHistory()" class="secondary-btn">Clear History</button>
+        </div>
+        <div id="downloadsList"></div>
+      </div>
+    </div>
+
+    <!-- Comments Tab -->
+    <div id="commentsTab" class="tab-content">
+      <div class="comments-section">
+        <h2 id="commentsTitle">💬 User Feedback</h2>
+        
+        <!-- Comment Form (Users) -->
+        <div id="commentForm" class="comment-form">
+          <h3>📝 Share Your Feedback</h3>
+          <form id="feedbackForm" onsubmit="submitComment(event)">
+            <textarea id="commentText" name="text" placeholder="Share your suggestions, feedback, or report any issues..." rows="4" required></textarea>
+            <div class="comment-actions">
+              <select id="commentCategory" name="category">
+                <option value="suggestion">💡 Suggestion</option>
+                <option value="bug">🐛 Bug Report</option>
+                <option value="feature">✨ Feature Request</option>
+                <option value="general">💬 General Feedback</option>
+              </select>
+              <button type="submit" class="primary-btn">Submit Feedback</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Comments Display -->
+        <div class="comments-display">
+          <h3 id="commentsDisplayTitle">📋 Recent Feedback</h3>
+          <div id="commentsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="about-section">
+      <h2>ℹ️ About PDF PLACE</h2>
+      <div class="about-content">
+        <div class="developer-info">
+          <h3>👨‍💻 Developed by AYUSH KUMAR</h3>
+          <div class="contact-info">
+            <p>📞 Contact: 7673085672</p>
+            <p>📧 Email: Ak7631459148@gmail.com</p>
+          </div>
+        </div>
+        <div class="app-info">
+          <p>PDF PLACE is your comprehensive educational resource platform, providing easy access to NCERT books, study notes, mock tests, previous year questions, and much more!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Preview Modal -->
+  <div id="previewModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="previewTitle">PDF Preview</h3>
+        <div class="preview-controls">
+          <button onclick="downloadCurrentPDF()" class="preview-download-btn">📥 Download</button>
+          <button onclick="toggleFullscreen()" class="fullscreen-btn">🔍 Fullscreen</button>
+          <span class="close-modal" onclick="closePreview()">&times;</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="preview-container">
+          <iframe id="previewFrame" src="" width="100%" height="600px"></iframe>
+          <div class="preview-loading" id="previewLoading">
+            <div class="loading-spinner"></div>
+            <p>Loading PDF...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
